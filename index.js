@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const cors = require('cors');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
@@ -30,9 +32,48 @@ async function run() {
 // my all database related code. First connect database and create collections.
 
     const database = client.db('shopManagement');
+    // product collection
     const productCollection = database.collection('products');
+    // user collection
+    const userCollection = database.collection('user');
 
 
+    // JWT
+
+    app.post('/jwt', (req,res)=>{
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: '10h'
+      });
+      res.send(token);
+    })
+
+
+    // user related apis
+    
+    // user signup
+
+    app.post('/signup', async(req,res)=>{
+      const {name,email,password} = req.body;
+      let hashpassword;
+      if(password){
+        const saltRounds = 10;
+        hashpassword = await bcrypt.hash(password, saltRounds);
+      }
+      const query = {email: email}
+      const existingUser = await userCollection.findOne(query);
+      if(existingUser){
+        return res.send({message: 'Email Already Exist'})
+      }
+      const result = userCollection.insertOne({
+        email,
+        name,
+        password: hashpassword
+      });
+
+      res.send({status: true, message: 'Registration Successful', result});
+
+    })
 
 
 
