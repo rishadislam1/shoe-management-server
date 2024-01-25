@@ -73,6 +73,33 @@ async function run() {
 
       res.send({status: true, message: 'Registration Successful', result});
 
+    });
+
+    // user login
+
+    app.post('/login', async(req,res)=>{
+      const {email, password} = req.body;
+
+      const user = await userCollection.findOne({email:email});
+      console.log(user)
+      if(!user){
+        return res.send({status: 'fail',message: 'Invalid Email'});
+      }
+      const passwordMatch = await bcrypt.compare(password,user.password);
+      if(!passwordMatch){
+        return res.send({status:'fail',message: 'Password Invalid'});
+      }
+
+      const token = jwt.sign({email: user.email, name: user.name},process.env.ACCESS_TOKEN_SECRET,{
+        expiresIn: '10h'
+      });
+      newUser={
+        _id: user._id,
+        email: user.email,
+        name: user.name
+      }
+
+      res.send({status: 'success', accessToken: token, message: 'Login Successful', newUser});
     })
 
 
