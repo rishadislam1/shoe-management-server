@@ -40,13 +40,25 @@ async function run() {
 
     // JWT
 
-    app.post('/jwt', (req,res)=>{
-      const user = req.body;
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '10h'
-      });
-      res.send(token);
+  // verify jwt
+
+  const verifyJWT = (req, res, next)=>{
+    const authorization = req.headers.authorization;
+    if(!authorization){
+      return res.status(401).send({
+        error: true,
+        message: 'Error Unauthorized Access'
+      })
+    }
+    const token = authorization.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded)=>{
+      if(error){
+        res.status(402).send({error:true, message: 'Unauthorized Access'})
+      }
+      req.decoded = decoded;
+      next();
     })
+  }
 
 
     // user related apis
@@ -103,7 +115,22 @@ async function run() {
     })
 
 
+    // shoe Management
 
+    // get Shoe
+
+    app.get('/shoe', async(req,res)=>{
+      const shoe = await productCollection.find().toArray();
+      res.send(shoe)
+    })
+
+    // add shoe
+
+    app.post('/addshoe', async(req,res)=>{
+      const data= req.body;
+      const result = productCollection.insertOne(data);
+      res.send({message: 'Product Added Successfully', result});
+    })
 
 
 
