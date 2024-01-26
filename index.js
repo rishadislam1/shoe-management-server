@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 // middleware
 
 app.use(cors());
@@ -93,7 +93,7 @@ async function run() {
       const {email, password} = req.body;
 
       const user = await userCollection.findOne({email:email});
-      console.log(user)
+   
       if(!user){
         return res.send({status: 'fail',message: 'Invalid Email'});
       }
@@ -119,9 +119,29 @@ async function run() {
 
     // get Shoe
 
-    app.get('/shoe', async(req,res)=>{
-      const shoe = await productCollection.find().toArray();
+    app.get('/shoe/:email', verifyJWT, async(req,res)=>{
+      const email = req.params.email;
+      const query={email:email}
+      const shoe = await productCollection.find(query).toArray();
       res.send(shoe)
+    })
+
+    // get single shoe
+
+    app.get('/singleshoe/:id/:email', verifyJWT, async(req,res)=>{
+      const id = req.params.id;
+      const email = req.params.email;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({ error: 'Invalid ID format' });
+      }
+      const query = { email: email, _id: new ObjectId(id) };
+    const shoe = await productCollection.findOne(query);
+
+    if (!shoe) {
+      return res.status(404).send({ error: 'Shoe not found' });
+    }
+
+    res.status(200).send(shoe);
     })
 
     // add shoe
@@ -130,6 +150,31 @@ async function run() {
       const data= req.body;
       const result = productCollection.insertOne(data);
       res.send({message: 'Product Added Successfully', result});
+    })
+    
+
+    // update Shoe
+
+    app.patch('/updateshoe/:id', async(req,res)=>{
+      const id = req.params.id;
+      const data = req.body;
+      const filter = {_id: new ObjectId(id)};
+      const updateDoc = {
+        $set: {
+          productPrice: data?.productPrice,
+          productName: data?.productName,
+          productQuantity: data?.productQuantity,
+          releaseDate: data?.releaseDate,
+          brand: data?.brand,
+          model: data?.model,
+          style: data?.style,
+          size: data?.size,
+          color: data?.color,
+          material: data?.material
+        }
+      }
+      const result = await productCollection.updateMany(filter,updateDoc);
+      res.send(result)
     })
 
 
