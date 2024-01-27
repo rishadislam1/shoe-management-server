@@ -179,20 +179,20 @@ async function run() {
 
     // delete shoe
 
-    app.delete('/deleteshoe', async(req,res)=>{
+    app.delete('/deleteshoe', verifyJWT, async(req,res)=>{
       const {ids} = req.body;
       for (const id of ids) {
-        const result = await productCollection.deleteOne({ _id: new ObjectId(id) });
-  
-        console.log(result);
+        await productCollection.deleteOne({ _id: new ObjectId(id) });
       }
-      console.log(ids);
-      res.status(200).send({ success: true, message: 'Bulk deletion successful' });
+      res.status(200).send({ success: true, message: 'Delete successful' });
     })
 
     // delete all shoe
 
-    
+    app.delete('/deleteall', verifyJWT, async(req,res)=>{
+      await productCollection.deleteMany({});
+      res.status(200).send({ success: true, message: 'Delete All successful' });
+    })
 
 
 
