@@ -177,6 +177,23 @@ async function run() {
       res.send(result)
     })
 
+    // delete shoe
+
+    app.delete('/deleteshoe', async(req,res)=>{
+      const {ids} = req.body;
+      for (const id of ids) {
+        const result = await productCollection.deleteOne({ _id: new ObjectId(id) });
+  
+        console.log(result);
+      }
+      console.log(ids);
+      res.status(200).send({ success: true, message: 'Bulk deletion successful' });
+    })
+
+    // delete all shoe
+
+    
+
 
 
     // Send a ping to confirm a successful connection
