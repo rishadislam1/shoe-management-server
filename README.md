@@ -1,6 +1,6 @@
 # Project Details
  ## Project Name: Shoe Inventory Management System
- ## live Url: 
+ ## live Url: https://l2b2-full-stack-a5-server-side-rishadislam1-two.vercel.app/
  ## Technology: nodejs, expressjs, cors, mongoDB
 
 # How to setup the application.
