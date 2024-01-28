@@ -1,3 +1,8 @@
+# Project Details
+ ## Project Name: Shoe Inventory Management System
+ ## live Url: 
+ ## Technology: nodejs, expressjs, cors, mongoDB
+
 # How to setup the application.
 
 First of all you can see this github. From this github you can either copy the link from code and in your terminal just put git clone "your link", it will automatically copy to your local machine and you can see the code or you can download from here directly. 
