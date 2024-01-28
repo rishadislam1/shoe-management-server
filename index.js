@@ -36,6 +36,8 @@ async function run() {
     const productCollection = database.collection('products');
     // user collection
     const userCollection = database.collection('user');
+    // sales collection
+    const sellCollection = database.collection('sales');
 
 
     // JWT
@@ -192,6 +194,31 @@ async function run() {
     app.delete('/deleteall', verifyJWT, async(req,res)=>{
       await productCollection.deleteMany({});
       res.status(200).send({ success: true, message: 'Delete All successful' });
+    })
+
+    // sell Product code
+
+    // add product to sell
+
+    app.post('/sales', verifyJWT, async(req,res)=>{
+      const data = req.body;
+      const {sellQuantity, buyerName, saleDate, productName, productId, avaiableQuantity, useEmail} = data;
+
+      if(avaiableQuantity === 0){
+        await productCollection.deleteOne({_id: new ObjectId(productId)});
+      }
+      else{
+        const filter ={_id: new ObjectId(productId)};
+        const updateDoc = {
+          $set:{
+            productQuantity: avaiableQuantity
+          }
+        }
+        await productCollection.updateOne(filter,updateDoc)
+      }
+
+      const result = sellCollection.insertOne({sellQuantity,buyerName,saleDate,productName, useEmail});
+      res.send({status:true});
     })
 
 
