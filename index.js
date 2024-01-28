@@ -191,8 +191,9 @@ async function run() {
 
     // delete all shoe
 
-    app.delete('/deleteall', verifyJWT, async(req,res)=>{
-      await productCollection.deleteMany({});
+    app.delete('/deleteall/:email', verifyJWT, async(req,res)=>{
+      const email = req.params.email;
+      await productCollection.deleteMany({email:email});
       res.status(200).send({ success: true, message: 'Delete All successful' });
     })
 
