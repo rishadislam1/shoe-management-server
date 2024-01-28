@@ -148,7 +148,7 @@ async function run() {
 
     // add shoe
 
-    app.post('/addshoe', async(req,res)=>{
+    app.post('/addshoe',verifyJWT,async(req,res)=>{
       const data= req.body;
       const result = productCollection.insertOne(data);
       res.send({message: 'Product Added Successfully', result});
@@ -221,6 +221,14 @@ async function run() {
       res.send({status:true});
     })
 
+    // get sales history data
+
+    app.get('/getsales/:userEmail', async (req,res)=>{
+      const userEmail = req.params.userEmail;
+      const result =  await sellCollection.find({ useEmail: userEmail}).toArray();
+      console.log(result)
+      res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection
