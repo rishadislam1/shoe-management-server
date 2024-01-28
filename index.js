@@ -223,10 +223,9 @@ async function run() {
 
     // get sales history data
 
-    app.get('/getsales/:userEmail', async (req,res)=>{
+    app.get('/getsales/:userEmail', verifyJWT, async (req,res)=>{
       const userEmail = req.params.userEmail;
-      const result =  await sellCollection.find({ useEmail: userEmail}).toArray();
-      console.log(result)
+      const result =  await sellCollection.find({ userEmail: userEmail}).toArray();
       res.send(result);
     })
 
